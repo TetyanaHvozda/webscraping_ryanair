@@ -2,31 +2,29 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.service import Service
 from datetime import datetime, timedelta
-from selenium.webdriver.chrome.options import Options
 import time
 import csv
 
 # Path to your ChromeDriver
-service = Service('')  # Update with the path to your driver
+service = Service('')
 
 # Start the browser
 driver = webdriver.Chrome(service=service)
 
 # List of destination airport codes
 cities = [
-    "ALC", "BCN"
-    #, "IBZ", "MAD"
-    # , "SVQ", "VLC", "AGP", "OPO", "LIS", "FAO",
-    # "KRK", "EIN", "BLQ", "NAP", "PMO", "RMI", "FCO", "DUB", "EDI", "STN",
-    # "MAN", "BVA", "MRS", "CGN"
+    "ALC", "BCN", "IBZ", "MAD", "SVQ", "VLC", "AGP", "OPO", "LIS", "FAO",
+    "KRK", "EIN", "BLQ", "NAP", "PMO", "RMI", "FCO", "DUB", "EDI", "STN",
+    "MAN", "BVA", "MRS", "CGN"
 ]
 
-# Get today's date and calculate the next 7 days
+# Get today's date and calculate the next days
 start_date = datetime.now() + timedelta(days=1)
 num_days = 3
 
 # CSV file to store flight details
 csv_filename = 'flight_data.csv'
+
 
 # Function to scrape flight data for a specific route and date
 def scrape_flights(origin, destination, date_out):
@@ -41,7 +39,7 @@ def scrape_flights(origin, destination, date_out):
     driver.get(url)
 
     # Wait for the page to load
-    time.sleep(5)
+    time.sleep(10)
 
     # Try to find flight cards on the page
     flight_cards = driver.find_elements(By.CSS_SELECTOR, "flight-card-new")
@@ -69,11 +67,12 @@ def scrape_flights(origin, destination, date_out):
 
                 # Extract origin and destination airports from attributes
                 origin_airport = \
-                card.find_element(By.CSS_SELECTOR, '[data-ref="origin-airport__VIE"]').get_attribute('data-ref').split(
-                    "__")[1]
+                    card.find_element(By.CSS_SELECTOR, '[data-ref="origin-airport__VIE"]').get_attribute(
+                        'data-ref').split(
+                        "__")[1]
                 destination_airport = \
-                card.find_element(By.CSS_SELECTOR, '[data-ref^="destination-airport__"]').get_attribute(
-                    'data-ref').split("__")[1]
+                    card.find_element(By.CSS_SELECTOR, '[data-ref^="destination-airport__"]').get_attribute(
+                        'data-ref').split("__")[1]
 
                 # Check if the flight is sold out
                 sold_out = card.find_elements(By.CSS_SELECTOR, 'flights-lazy-sold-out-flight-card')
@@ -94,7 +93,6 @@ def scrape_flights(origin, destination, date_out):
         print(f"No flight cards found for {origin} to {destination} on {date_out}.")
 
     return flight_data
-
 
 
 # Open the CSV file in write mode
@@ -136,6 +134,3 @@ with open(csv_filename, mode='w', newline='', encoding='utf-8') as file:
 driver.quit()
 
 print(f"Flight data has been saved to {csv_filename}.")
-
-
-
