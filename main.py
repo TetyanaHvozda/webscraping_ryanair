@@ -19,7 +19,7 @@ cities = [
 ]
 
 # Get today's date and calculate the next days
-start_date = datetime.now() + timedelta(days=1)
+start_date = datetime.now() + timedelta(days=2)
 num_days = 3
 
 # CSV file to store flight details
@@ -50,45 +50,38 @@ def scrape_flights(origin, destination, date_out):
     if flight_cards:
         for card in flight_cards:
             try:
-                # Extract departure time and arrival time
                 departure_time = card.find_element(By.CSS_SELECTOR,
                                                    '[data-ref="flight-segment.departure"] .flight-info__hour').text
                 arrival_time = card.find_element(By.CSS_SELECTOR,
                                                  '[data-ref="flight-segment.arrival"] .flight-info__hour').text
 
-                # Extract origin and destination cities
                 origin_city = card.find_element(By.CSS_SELECTOR,
                                                 '[data-ref="flight-segment.departure"] .flight-info__city').text
                 destination_city = card.find_element(By.CSS_SELECTOR,
                                                      '[data-ref="flight-segment.arrival"] .flight-info__city').text
-
-                # Extract flight number
                 flight_number = card.find_element(By.CSS_SELECTOR, '.card-flight-num__content').text
 
-                # Extract origin and destination airports from attributes
                 origin_airport = \
-                    card.find_element(By.CSS_SELECTOR, '[data-ref="origin-airport__VIE"]').get_attribute(
-                        'data-ref').split(
-                        "__")[1]
+                card.find_element(By.CSS_SELECTOR, '[data-ref^="origin-airport__"]').get_attribute('data-ref').split(
+                    "__")[1]
                 destination_airport = \
-                    card.find_element(By.CSS_SELECTOR, '[data-ref^="destination-airport__"]').get_attribute(
-                        'data-ref').split("__")[1]
+                card.find_element(By.CSS_SELECTOR, '[data-ref^="destination-airport__"]').get_attribute(
+                    'data-ref').split("__")[1]
 
-                # Check if the flight is sold out
                 sold_out = card.find_elements(By.CSS_SELECTOR, 'flights-lazy-sold-out-flight-card')
                 if sold_out:
-                    price = 'Ausverkauft'
+                    price = 'sold out'
                 else:
-                    # Extract the price if the flight is not sold out
                     price = card.find_element(By.CSS_SELECTOR, '.flight-card-summary__new-value').text
 
-                # Append flight data as a row
                 flight_data.append(
                     [flight_number, origin_city, origin_airport, destination_city, destination_airport,
-                     date_out, departure_time, arrival_time, price])
+                     date_out, departure_time, arrival_time, price]
+                )
 
             except Exception as e:
                 print(f"Error extracting flight details: {e}")
+
     else:
         print(f"No flight cards found for {origin} to {destination} on {date_out}.")
 
@@ -103,7 +96,7 @@ with open(csv_filename, mode='w', newline='', encoding='utf-8') as file:
                      'Departure Date', 'Departure Time', 'Arrival Time', 'Price'])
 
     # Loop over each city as destination and scrape flights for the next 7 days
-    origin = "VIE"  # Vienna airport code
+    origin = "VIE"
     for destination in cities:
         for i in range(num_days):
             # Calculate the date for the specific day
@@ -117,7 +110,7 @@ with open(csv_filename, mode='w', newline='', encoding='utf-8') as file:
                 writer.writerow(flight)
 
     # Loop over each city as the origin and scrape flights for the next 7 days with Vienna as the destination
-    destination = "VIE"  # Vienna as the destination
+    destination = "VIE"
     for origin in cities:
         for i in range(num_days):
             # Calculate the date for the specific day
