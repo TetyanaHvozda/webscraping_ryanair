@@ -4,6 +4,7 @@ from selenium.webdriver.chrome.service import Service
 from datetime import datetime, timedelta
 import time
 import csv
+import mysql.connector
 
 # Path to your ChromeDriver
 service = Service('')
@@ -11,15 +12,25 @@ service = Service('')
 # Start the browser
 driver = webdriver.Chrome(service=service)
 
+# MySQL connection details
+connection = mysql.connector.connect(
+    host="localhost",
+    user="root",
+    password="",
+    database="flights"
+)
+
+
 # List of destination airport codes
 cities = [
-    "ALC", "BCN", "IBZ", "MAD", "SVQ", "VLC", "AGP", "OPO", "LIS", "FAO",
-    "KRK", "EIN", "BLQ", "NAP", "PMO", "RMI", "FCO", "DUB", "EDI", "STN",
-    "MAN", "BVA", "MRS", "CGN"
+    "ALC", "BCN"
+    #, "IBZ", "MAD", "SVQ", "VLC", "AGP", "OPO", "LIS", "FAO",
+    # "KRK", "EIN", "BLQ", "NAP", "PMO", "RMI", "FCO", "DUB", "EDI", "STN",
+    # "MAN", "BVA", "MRS", "CGN"
 ]
 
 # Get today's date and calculate the next days
-start_date = datetime.now() + timedelta(days=2)
+start_date = datetime.now() + timedelta(days=1)
 num_days = 3
 
 # CSV file to store flight details
@@ -88,42 +99,72 @@ def scrape_flights(origin, destination, date_out):
     return flight_data
 
 
-# Open the CSV file in write mode
-with open(csv_filename, mode='w', newline='', encoding='utf-8') as file:
-    writer = csv.writer(file)
-    # Write header row
-    writer.writerow(['Flight Number', 'Origin City', 'Origin Airport', 'Destination City', 'Destination Airport',
-                     'Departure Date', 'Departure Time', 'Arrival Time', 'Price'])
+# Function to create the table if it doesn't exist
+def create_table_if_not_exists(connection):
+    cursor = connection.cursor()
+    create_table_query = """
+    CREATE TABLE IF NOT EXISTS flights (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        flight_number VARCHAR(10),
+        origin_city VARCHAR(100),
+        origin_airport VARCHAR(10),
+        destination_city VARCHAR(100),
+        destination_airport VARCHAR(10),
+        departure_date DATE,
+        departure_time TIME,
+        arrival_time TIME,
+        price VARCHAR(64)
+    );
+    """
+    cursor.execute(create_table_query)
+    connection.commit()
+    cursor.close()
 
-    # Loop over each city as destination and scrape flights for the next 7 days
-    origin = "VIE"
-    for destination in cities:
-        for i in range(num_days):
-            # Calculate the date for the specific day
-            date_out = (start_date + timedelta(days=i)).strftime('%Y-%m-%d')
 
-            # Scrape the flight data for the route and date
-            flights = scrape_flights(origin, destination, date_out)
+# Function to insert flight data into the database
+def insert_flight_data(connection, flight_data):
+    cursor = connection.cursor()
+    insert_query = """
+    INSERT INTO flights (flight_number, origin_city, origin_airport, destination_city, 
+                         destination_airport, departure_date, departure_time, arrival_time, price)
+    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+    """
+    cursor.executemany(insert_query, flight_data)
+    connection.commit()
+    cursor.close()
 
-            # Write flight data to CSV
-            for flight in flights:
-                writer.writerow(flight)
 
-    # Loop over each city as the origin and scrape flights for the next 7 days with Vienna as the destination
-    destination = "VIE"
-    for origin in cities:
-        for i in range(num_days):
-            # Calculate the date for the specific day
-            date_out = (start_date + timedelta(days=i)).strftime('%Y-%m-%d')
+# Main script
+create_table_if_not_exists(connection)
 
-            # Scrape the flight data for the reverse route and date
-            flights = scrape_flights(origin, destination, date_out)
+# Loop over each city as destination and scrape flights for the next 7 days
+origin = "VIE"
+for destination in cities:
+    for i in range(num_days):
+        # Calculate the date for the specific day
+        date_out = (start_date + timedelta(days=i)).strftime('%Y-%m-%d')
 
-            # Write flight data to CSV
-            for flight in flights:
-                writer.writerow(flight)
+        # Scrape the flight data for the route and date
+        flights = scrape_flights(origin, destination, date_out)
+
+        if flights:
+            insert_flight_data(connection, flights)
+
+# Loop over each city as the origin and scrape flights for the next 7 days with Vienna as the destination
+destination = "VIE"
+for origin in cities:
+    for i in range(num_days):
+        # Calculate the date for the specific day
+        date_out = (start_date + timedelta(days=i)).strftime('%Y-%m-%d')
+
+        # Scrape the flight data for the reverse route and date
+        flights = scrape_flights(origin, destination, date_out)
+
+        if flights:
+            insert_flight_data(connection, flights)
 
 # Close the browser after scraping is complete
 driver.quit()
+connection.close()
 
-print(f"Flight data has been saved to {csv_filename}.")
+print(f"Flight data has been saved to the MySQL database.")
