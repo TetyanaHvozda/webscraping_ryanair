@@ -1,4 +1,21 @@
 Flight Number,Origin City,Origin Airport,Destination City,Destination Airport,Departure Date,Departure Time,Arrival Time,Price
-FR 580,Wien,VIE,Ibiza,IBZ,2024-10-25,07:30,10:05,"€173,00"
-FR 689,Wien,VIE,Madrid,MAD,2024-10-25,06:10,09:20,sold out
-FR 689,Wien,VIE,Madrid,MAD,2024-10-26,10:50,14:00,sold out
+FR 6987,Wien,VIE,Alicante,ALC,2024-10-27,05:50,08:45,sold out
+FR 1567,Wien,VIE,Alicante,ALC,2024-10-27,15:40,18:35,sold out
+FR 1567,Wien,VIE,Alicante,ALC,2024-10-28,05:55,08:50,sold out
+FR 1567,Wien,VIE,Alicante,ALC,2024-10-29,10:30,13:25,"€94,92"
+FR 7350,Wien,VIE,Barcelona El Prat,BCN,2024-10-27,13:15,15:40,sold out
+FR 13,Wien,VIE,Barcelona El Prat,BCN,2024-10-27,16:15,18:35,"€106,76"
+FR 13,Wien,VIE,Barcelona El Prat,BCN,2024-10-28,05:55,08:20,"€106,76"
+FR 7350,Wien,VIE,Barcelona El Prat,BCN,2024-10-28,19:55,22:20,"€109,42"
+FR 7350,Wien,VIE,Barcelona El Prat,BCN,2024-10-29,10:05,12:30,"€62,04"
+FR 13,Wien,VIE,Barcelona El Prat,BCN,2024-10-29,14:00,16:25,sold out
+FR 6988,Alicante,ALC,Wien,VIE,2024-10-27,09:20,12:10,"€18,30"
+FR 1568,Alicante,ALC,Wien,VIE,2024-10-27,19:10,22:00,"€58,99"
+FR 1568,Alicante,ALC,Wien,VIE,2024-10-28,09:25,12:10,
+FR 1568,Alicante,ALC,Wien,VIE,2024-10-29,14:00,16:50,sold out
+FR 12,Barcelona El Prat,BCN,Wien,VIE,2024-10-27,13:20,15:45,
+FR 7351,Barcelona El Prat,BCN,Wien,VIE,2024-10-27,16:30,18:55,sold out
+FR 12,Barcelona El Prat,BCN,Wien,VIE,2024-10-28,09:05,11:30,
+FR 7351,Barcelona El Prat,BCN,Wien,VIE,2024-10-28,17:05,19:30,
+FR 7351,Barcelona El Prat,BCN,Wien,VIE,2024-10-29,13:05,15:30,
+FR 12,Barcelona El Prat,BCN,Wien,VIE,2024-10-29,17:00,19:25,sold out
