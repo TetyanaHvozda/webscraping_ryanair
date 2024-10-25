@@ -3,7 +3,6 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.service import Service
 from datetime import datetime, timedelta
 import time
-import csv
 import mysql.connector
 
 # Path to your ChromeDriver
@@ -20,21 +19,16 @@ connection = mysql.connector.connect(
     database="flights"
 )
 
-
 # List of destination airport codes
 cities = [
-    "ALC", "BCN"
-    #, "IBZ", "MAD", "SVQ", "VLC", "AGP", "OPO", "LIS", "FAO",
-    # "KRK", "EIN", "BLQ", "NAP", "PMO", "RMI", "FCO", "DUB", "EDI", "STN",
-    # "MAN", "BVA", "MRS", "CGN"
+    "ALC", "BCN", "IBZ", "MAD", "SVQ", "VLC", "AGP", "CGN",
+    "OPO", "LIS", "FAO", "KRK", "EIN", "BLQ", "NAP", "MRS",
+    "PMO", "RMI", "FCO", "DUB", "EDI", "STN", "MAN", "BVA"
 ]
 
 # Get today's date and calculate the next days
-start_date = datetime.now() + timedelta(days=1)
+start_date = datetime.now() #+ timedelta(days=1)
 num_days = 3
-
-# CSV file to store flight details
-csv_filename = 'flight_data.csv'
 
 
 # Function to scrape flight data for a specific route and date
@@ -73,11 +67,12 @@ def scrape_flights(origin, destination, date_out):
                 flight_number = card.find_element(By.CSS_SELECTOR, '.card-flight-num__content').text
 
                 origin_airport = \
-                card.find_element(By.CSS_SELECTOR, '[data-ref^="origin-airport__"]').get_attribute('data-ref').split(
-                    "__")[1]
+                    card.find_element(By.CSS_SELECTOR, '[data-ref^="origin-airport__"]').get_attribute(
+                        'data-ref').split(
+                        "__")[1]
                 destination_airport = \
-                card.find_element(By.CSS_SELECTOR, '[data-ref^="destination-airport__"]').get_attribute(
-                    'data-ref').split("__")[1]
+                    card.find_element(By.CSS_SELECTOR, '[data-ref^="destination-airport__"]').get_attribute(
+                        'data-ref').split("__")[1]
 
                 sold_out = card.find_elements(By.CSS_SELECTOR, 'flights-lazy-sold-out-flight-card')
                 if sold_out:
@@ -116,6 +111,7 @@ def create_table_if_not_exists(connection):
         price VARCHAR(64)
     );
     """
+
     cursor.execute(create_table_query)
     connection.commit()
     cursor.close()
@@ -134,7 +130,7 @@ def insert_flight_data(connection, flight_data):
     cursor.close()
 
 
-# Main script
+#run the create table function
 create_table_if_not_exists(connection)
 
 # Loop over each city as destination and scrape flights for the next 7 days
