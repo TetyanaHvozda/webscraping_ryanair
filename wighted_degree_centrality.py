@@ -59,6 +59,7 @@ def visualize_routes(graph):
 
     # Draw labels for nodes
     nx.draw_networkx_labels(graph, pos, font_size=10, font_family="sans-serif")
+    nx.draw_networkx_edge_labels(graph, pos, edge_labels=weights, font_size=8)
 
     plt.title("Flight Routes Visualization")
     plt.show()
